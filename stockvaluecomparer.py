@@ -19,8 +19,10 @@ def main():
         df = df.query("~`ITEM DETAILS`.isnull()")
         columns = ['DEPARMENT', 'ITEM DETAILS', 'ITEM CODE', 'CURRENT STOCK']
         df = pd.DataFrame(df, columns=columns)
+        df = df.rename(columns={"CURRENT STOCK":"CURRENT STOCK IN GA STORE"})
+        df = df.rename(columns={"DEPARMENT":"DEPARTMENT"})
 
-        st.dataframe(df)
+        # st.dataframe(df)
 
         uploaded_file = st.sidebar.file_uploader("Choose a file (A/R Receivable ONLY)", type=["csv", "xlsx"])
         if uploaded_file is not None:
@@ -29,9 +31,35 @@ def main():
             elif uploaded_file.name.endswith('.xlsx'):
                 df_uploaded = pd.read_excel(uploaded_file)
             
+            df_uploaded = pd.DataFrame(df_uploaded, columns=['Item Code', 'UOM', 'Item Group', 'Item Type', 'Description', 'Qty'])
+            df_uploaded = df_uploaded.rename(columns={ "Qty" : "CURRENT STOCK IN AUTOCOUNT" })
+            df_uploaded = df_uploaded.rename(columns={ "Item Code" : "ITEM CODE" })
+            df_uploaded = df_uploaded.iloc[:-1]
 
+
+            df_merged = pd.merge(df_uploaded, df[['ITEM CODE', 'DEPARTMENT', 'CURRENT STOCK IN GA STORE']], on='ITEM CODE', how='left')
+            df_merged['DIFF'] = df_merged['CURRENT STOCK IN AUTOCOUNT'] - df_merged['CURRENT STOCK IN GA STORE']
             
-            st.dataframe(df_uploaded)
+            # st.dataframe(df_uploaded)
+
+            total_items, total_items_not_exist, total_balance_items, total_over_items, total_negative_items = st.columns(5)
+
+            with total_items:
+                 st.metric(label="Total Items are Balance", value=len(df_merged))
+            
+            with total_items_not_exist:
+                 st.metric(label="Total Items does not Exist", value=df_merged["CURRENT STOCK IN GA STORE"].isnull().sum())
+
+            with total_balance_items:
+                 st.metric(label="Total Items are Balance", value=len(df_merged.query('DIFF == 0')))
+
+            with total_over_items:
+                 st.metric(label="Total Items are Over (-diff)", value=len(df_merged.query('DIFF < 0')))
+
+            with total_negative_items:
+                 st.metric(label="Total Item are Below (+diff)", value=len(df_merged.query('DIFF > 0')))
+            
+            st.dataframe(df_merged)
         else:
               st.warning("please upload file")
 
