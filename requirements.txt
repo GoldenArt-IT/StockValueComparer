@@ -7,4 +7,3 @@ streamlit>=1.22.0
 git+https://github.com/streamlit/gsheets-connection.git
 gspread
 oauth2client
-python3-distutils
