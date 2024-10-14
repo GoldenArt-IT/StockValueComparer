@@ -24,7 +24,7 @@ def main():
 
         # st.dataframe(df)
 
-        uploaded_file = st.sidebar.file_uploader("Choose a file (A/R Receivable ONLY)", type=["csv", "xlsx"])
+        uploaded_file = st.sidebar.file_uploader("Please upload file", type=["csv", "xlsx"])
         if uploaded_file is not None:
             if uploaded_file.name.endswith('.csv'):
                 df_uploaded = pd.read_csv(uploaded_file)
