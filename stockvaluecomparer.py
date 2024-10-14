@@ -61,7 +61,7 @@ def main():
             
             st.dataframe(df_merged)
         else:
-              st.warning("Please upload file", "⚠")
+              st.warning("Please upload file", icon="⚠")
 
 if __name__ == "__main__":
     main()
