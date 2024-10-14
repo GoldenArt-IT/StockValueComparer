@@ -9,11 +9,12 @@ def main():
         # Set page to always wide
         st.set_page_config(layout="wide")
 
-        st.title("Data BOM for Wood Material")
+        st.title("Stock Value Comparer")
 
         conn = st.connection("gsheets", type=GSheetsConnection)
-        df = conn.read(worksheet="ORDER BY WOOD", ttl=5)
+        df = conn.read(worksheet="DATA", ttl=5)
         df = df.dropna(how="all")
+        st.dataframe(df)
 
 if __name__ == "__main__":
     main()
