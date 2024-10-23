@@ -84,7 +84,14 @@ def main():
             st.metric(label="Total Items Below (+diff)", value=len(df_merged.query('DIFF > 0')))
 
         # Display filtered data
+        st.subheader("Comparison Table")
         st.dataframe(df_merged)
+
+        # Display duplicate item
+        duplicate_items = df_merged[df_merged.duplicated(subset='ITEM CODE', keep=False)]
+        st.subheader("Duplicate Items")
+        st.dataframe(duplicate_items)
+
     else:
         st.warning("Please upload file", icon="⚠")
 
