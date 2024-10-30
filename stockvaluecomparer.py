@@ -40,7 +40,12 @@ def main():
         df_merged['DIFF'] = df_merged['CURRENT STOCK IN AUTOCOUNT'] - df_merged['CURRENT STOCK IN GA STORE']
 
         # Add a new column 'DIFF LABEL' for filtering
-        df_merged['DIFF LABEL'] = df_merged['DIFF'].apply(lambda x: 'Balance' if x == 0 else ('Unbalance (+)' if x > 0 else 'Unbalance (-)'))
+        tolerance = 1e-9 # in the diff, there are near-zero values as zero
+        df_merged['DIFF LABEL'] = df_merged['DIFF'].apply(
+            lambda x: 'Balance' if abs(x) < tolerance
+            else ('Unbalance (+)' if x > 0 
+            else ('Unbalance (-)' if x < 0
+            else 'No Value')))
 
         # Apply dynamic filtering
         selected_departments = st.sidebar.multiselect('Filter by DEPARTMENT', df_merged['DEPARTMENT'].dropna().unique())
@@ -61,7 +66,7 @@ def main():
             df_merged = df_merged[df_merged['Description'].isin(selected_descriptions)]
 
         # Finally apply DIFF filter
-        selected_diff_label = st.sidebar.multiselect('Filter by DIFF', ['Balance', 'Unbalance (+)', 'Unbalance (-)'])
+        selected_diff_label = st.sidebar.multiselect('Filter by DIFF', ['Balance', 'Unbalance (+)', 'Unbalance (-)', 'No Value'])
         if selected_diff_label:
             df_merged = df_merged[df_merged['DIFF LABEL'].isin(selected_diff_label)]
 
@@ -75,13 +80,13 @@ def main():
             st.metric(label="Total Items not Exist", value=df_merged["CURRENT STOCK IN GA STORE"].isnull().sum())
 
         with total_balance_items:
-            st.metric(label="Total Items are Balance", value=len(df_merged.query('DIFF == 0')))
+            st.metric(label="Total Items are Balance", value=len(df_merged.query('`DIFF LABEL` == "Balance"')))
 
         with total_over_items:
-            st.metric(label="Total Items Over (-diff)", value=len(df_merged.query('DIFF < 0')))
+            st.metric(label="Total Items Over (-diff)", value=len(df_merged.query('`DIFF LABEL` == "Unbalance (-)"')))
 
         with total_negative_items:
-            st.metric(label="Total Items Below (+diff)", value=len(df_merged.query('DIFF > 0')))
+            st.metric(label="Total Items Below (+diff)", value=len(df_merged.query('`DIFF LABEL` == "Unbalance (+)"')))
 
         # Display filtered data
         st.subheader("Comparison Table")
