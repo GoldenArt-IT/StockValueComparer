@@ -88,9 +88,21 @@ def main():
         with total_negative_items:
             st.metric(label="Total Items Below (+diff)", value=len(df_merged.query('`DIFF LABEL` == "Unbalance (+)"')))
 
+        # Departments vs Diff Labels (Pivot Table)
+        pivot_department_difflabels = df_merged.pivot_table(
+            index='DEPARTMENT',
+            columns='DIFF LABEL',
+            values='DIFF',
+            aggfunc='count',
+            fill_value=0)
+
         # Display filtered data
         st.subheader("Comparison Table")
         st.dataframe(df_merged)
+
+        # Display pivot table
+        st.subheader("Balance Summary by Deparment")
+        st.dataframe(pivot_department_difflabels)
 
         # Display duplicate item
         duplicate_items = df_merged[df_merged.duplicated(subset='ITEM CODE', keep=False)]
