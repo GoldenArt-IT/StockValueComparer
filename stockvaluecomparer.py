@@ -36,7 +36,7 @@ def main():
         df_uploaded = df_uploaded.iloc[:-1]
 
         # Merge and compute differences
-        df_merged = pd.merge(df_uploaded, df[['ITEM CODE', 'DEPARTMENT', 'CURRENT STOCK IN GA STORE']], on='ITEM CODE', how='left')
+        df_merged = pd.merge(df_uploaded, df[['ITEM DETAILS', 'ITEM CODE', 'DEPARTMENT', 'CURRENT STOCK IN GA STORE']], on='ITEM CODE', how='left')
         df_merged['DIFF'] = df_merged['CURRENT STOCK IN AUTOCOUNT'] - df_merged['CURRENT STOCK IN GA STORE']
 
         # Add a new column 'DIFF LABEL' for filtering
