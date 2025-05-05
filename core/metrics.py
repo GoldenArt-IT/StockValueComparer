@@ -13,3 +13,6 @@ def show_metrics(df):
         st.metric("Total Over (-diff)", len(df.query('`DIFF LABEL` == "Unbalance (-)"')))
     with under:
         st.metric("Total Below (+diff)", len(df.query('`DIFF LABEL` == "Unbalance (+)"')))
+
+def show_metric_for_duplicated_data(df):
+    st.metric("Total Items", len(df[df.duplicated(subset='TIMESTAMP', keep=False)]))
