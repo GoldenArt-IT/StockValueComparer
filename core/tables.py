@@ -10,3 +10,9 @@ def show_tables(df):
 
     st.subheader("Duplicate Items")
     st.dataframe(df[df.duplicated(subset='ITEM CODE', keep=False)])
+
+def show_records(df):
+    st.subheader("Duplicate Records in GA Store")
+    df = df[df.duplicated(subset='TIMESTAMP', keep=False)]
+    df = df.sort_values(by='TIMESTAMP')
+    st.dataframe(df)
