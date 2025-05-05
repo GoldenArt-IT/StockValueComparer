@@ -15,6 +15,7 @@ def load_sheet_data(_conn):
     })
     return df
 
+@st.cache_data(ttl=10)
 def load_sheet_record(_conn):
     df = _conn.read(worksheet="STOCK RECORDS", ttl=5)
     df = df.dropna(how="all")
